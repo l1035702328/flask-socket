@@ -18,6 +18,7 @@ class MyView(MethodView):
         return "world"
 
 index.add_url_rule('/', endpoint='login', view_func=MyView.as_view('login'))
+index.add_url_rule('/login', endpoint='login2', view_func=MyView.as_view('login'))
 # @index.route('/')
 # def show():
 #     return 'app02.hello'
