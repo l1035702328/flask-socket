@@ -22,7 +22,7 @@ db = SQLAlchemy()
 
 def create_app(config_name):
     app.config.from_object(config[config_name])
-    config[config_name].init_app(app)
+    # config[config_name].init_app(app)
     db.init_app(app)
     # 注册路由
     app.register_blueprint(user, url_prefix='/')
