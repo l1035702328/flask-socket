@@ -8,3 +8,5 @@ venv\Scripts\activate
 
 # 更新 同上
 python manage.py db upgrade
+
+每次我们部署后，我们重启服务后，原来的定时任务都需要重启，这样对我们经常迭代的项目肯定是不行的
