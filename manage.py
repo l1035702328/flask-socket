@@ -3,12 +3,17 @@
 # 有一个可能适用于 Arduino 的 C++：https ://github.com/socketio/socket.io-client-cpp 。
 
 import os
+
+
+
 from myflask import create_app, db
-from myflask.models import User, Role
-from flask_script import Manager, Shell
+from flask_script import Manager, Shell, Server
 from flask_migrate import Migrate, MigrateCommand
+
+
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
+manager.add_command("runserver", Server(host='0.0.0.0', use_debugger=False))
 
 migrate = Migrate(app, db)
 # def make_shell_context():
