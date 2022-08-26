@@ -37,12 +37,14 @@ def create_app(config_name):
     register_extensions(app)
     # 注册路由
     from myflask.user import user
+    from myflask.monitor import monitor
     app.register_blueprint(user, url_prefix='/')
+    app.register_blueprint(monitor, url_prefix='/monitor')
 
     # 定时任务
     scheduler = APScheduler()
     scheduler.init_app(app)
-    scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=300, args=["desire"], replace_existing=True)
+    scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=300, args=[], replace_existing=True)
     scheduler.start()
 
     # 钩子函数

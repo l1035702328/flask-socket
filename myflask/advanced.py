@@ -8,9 +8,6 @@ from flask_apscheduler import scheduler
 
 
 
-def job2(var_one=3, var_two=7):
-    """Demo job function.
-    :param var_two:
-    :param var_two:
-    """
-    print(str(var_one) + " " + str(var_two))
+def job2():
+    # 定时采集redis的数据上传至mysql
+    return ''
