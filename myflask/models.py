@@ -22,6 +22,7 @@ class User(db.Model):
     update_time=db.Column(db.DateTime,default=datetime.now(),onupdate=datetime.now(),doc='用户修改时间')
     status=db.Column(db.Integer,doc='用户状态')
     role_id = db.Column(db.Integer, db.ForeignKey('t_roles.id'))
+    role = db.relationship('Role', backref='user_of_role')
 
     def set_password(self, password):
         self.password = bcrypt.generate_password_hash(password)
@@ -35,7 +36,7 @@ class Role(db.Model):
      __tablename__ = 't_roles'
      id = db.Column(db.Integer, primary_key=True)
      name = db.Column(db.String(64), unique=True)
-     users = db.relationship('User', backref='t_roles')
+
 
      def __repr__(self):
         return '<Role %r>' % self.name

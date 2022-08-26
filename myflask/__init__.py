@@ -11,11 +11,12 @@ from flask import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_apscheduler import APScheduler
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt_identity, get_jwt_claims
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 from flask_bcrypt import Bcrypt
 from myflask import advanced
+from myflask.myhook import sys_before_request
 
 pymysql.install_as_MySQLdb()
 db = SQLAlchemy()
@@ -41,15 +42,17 @@ def create_app(config_name):
     # 定时任务
     scheduler = APScheduler()
     scheduler.init_app(app)
-    scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=3, args=["desire"], replace_existing=True)
+    scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=300, args=["desire"], replace_existing=True)
     scheduler.start()
 
+    # 钩子函数
+    app.before_request(sys_before_request)
     return app
 
 # admin管理
 def register_extensions(app):
     from myflask.models import User, Role
-    admin = Admin(app, name='microblog', template_mode='bootstrap3')
+    admin = Admin(app, name='admin', template_mode='bootstrap3')
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Role, db.session))
 
@@ -57,8 +60,8 @@ def register_extensions(app):
 def init_user(app):
     from myflask.models import User, Role
     with app.app_context():
-        result = User.query.filter(User.id < 5).delete()
-        result = Role.query.filter(Role.id < 5).delete()
+        result = User.query.filter(User.id < 3).delete()
+        result = Role.query.filter(Role.id < 3).delete()
         role_admin = Role(id=1, name='admin')
         role_guest = Role(id=2, name='guest')
         db.session.add(role_admin)

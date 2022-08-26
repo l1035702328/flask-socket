@@ -1,11 +1,18 @@
+import datetime
 import os
+
+
 from apscheduler.jobstores.redis import RedisJobStore
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
+
+    JWT_ALGORITHM = 'HS256'
     JWT_SECRET_KEY = SECRET_KEY
-    JWT_REFRESH_TOKEN_EXPIRES = '604800'
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=10)
+    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=7)
+
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
