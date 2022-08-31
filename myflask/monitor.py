@@ -16,6 +16,7 @@ monitor = Blueprint('monitor_view', __name__)
 class RealMonitor(LoginRequiredMixin,MethodView):
     def get(self):
         # 获取redis实时数据
+
         return "hello"
 
 monitor.add_url_rule('/', endpoint='index', view_func=RealMonitor.as_view('index'))

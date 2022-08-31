@@ -10,4 +10,5 @@ from flask_apscheduler import scheduler
 
 def job2():
     # 定时采集redis的数据上传至mysql
+
     return ''

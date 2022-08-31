@@ -23,18 +23,14 @@ class Config:
     def init_app(app):
         pass
 
-    # # 定时任务
-    # JOBS = [
-    #     {
-    #         "id": "job1",
-    #         "func": "advanced:job1",
-    #         "args": (1, 2),
-    #         "trigger": "interval",
-    #         "seconds": 10,
-    #     }
-    # ]
+    REDIS_DB_URL = {
+        'host': '119.91.55.183',
+        'port': 6379,
+        'password': '',
+        'db': 3
+    }
 
-    SCHEDULER_JOBSTORES = {"default": RedisJobStore(db=3, host="119.91.55.183", port=6379, password='')}
+    SCHEDULER_JOBSTORES = {"default": RedisJobStore(db=3, host="119.91.55.183", port=6379, password='1156989490')}
 
     SCHEDULER_EXECUTORS = {"default": {"type": "threadpool", "max_workers": 20}}
 

@@ -10,6 +10,7 @@ from myflask import create_app, db
 from flask_script import Manager, Shell, Server
 from flask_migrate import Migrate, MigrateCommand
 
+from mysocket import socket_server
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -22,7 +23,7 @@ migrate = Migrate(app, db)
 # manager.add_command("shell", Shell(make_context=make_shell_context))
 # 添加迁移命令集 到脚本命令
 manager.add_command('db', MigrateCommand)
-
+manager.add_command('socketserver', socket_server.SocketRun())
 
 if __name__ == '__main__':
     manager.run()
