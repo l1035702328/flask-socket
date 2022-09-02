@@ -26,11 +26,10 @@ class Config:
     REDIS_DB_URL = {
         'host': '119.91.55.183',
         'port': 6379,
-        'password': '',
-        'db': 3
+        'password': '1156989490',
+        'db': 1
     }
-
-    SCHEDULER_JOBSTORES = {"default": RedisJobStore(db=3, host="119.91.55.183", port=6379, password='1156989490')}
+    SCHEDULER_JOBSTORES = {"default": RedisJobStore(**REDIS_DB_URL)}
 
     SCHEDULER_EXECUTORS = {"default": {"type": "threadpool", "max_workers": 20}}
 

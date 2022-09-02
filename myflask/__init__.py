@@ -11,7 +11,7 @@ from flask import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_apscheduler import APScheduler
-from flask_jwt_extended import JWTManager, get_jwt_identity, get_jwt_claims
+from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 from flask_bcrypt import Bcrypt
@@ -35,17 +35,21 @@ def create_app(config_name):
     init_user(app)
     # 使用admin管理
     register_extensions(app)
-    # 注册路由
-    from myflask.user import user
-    from myflask.monitor import monitor
-    app.register_blueprint(user, url_prefix='/')
-    app.register_blueprint(monitor, url_prefix='/monitor')
 
     # 定时任务
     scheduler = APScheduler()
     scheduler.init_app(app)
     scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=300, args=[], replace_existing=True)
     scheduler.start()
+
+    # redis 连接池
+
+    # 注册路由
+    from myflask.user import user
+    from myflask.monitor import monitor
+    app.register_blueprint(user, url_prefix='/')
+    app.register_blueprint(monitor, url_prefix='/monitor')
+
 
     # 钩子函数
     app.before_request(sys_before_request)
