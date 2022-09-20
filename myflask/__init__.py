@@ -15,16 +15,16 @@ from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 from flask_bcrypt import Bcrypt
-from myflask import advanced
 from myflask.myhook import sys_before_request
+import redis
+
 
 pymysql.install_as_MySQLdb()
 db = SQLAlchemy()
+# 密码散列
 bcrypt = Bcrypt()
-
-
+app = Flask(__name__)
 def create_app(config_name):
-    app = Flask(__name__)
     app.config.from_object(config[config_name])
     # jwt鉴权
     jwt = JWTManager()
@@ -35,21 +35,22 @@ def create_app(config_name):
     init_user(app)
     # 使用admin管理
     register_extensions(app)
+    # redis 连接池
+    redis_client = redis.Redis(**app.config.get("REDIS_DB_URL"))
+    app.config.redis = redis_client
 
     # 定时任务
+    from myflask import advanced
     scheduler = APScheduler()
     scheduler.init_app(app)
-    scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=300, args=[], replace_existing=True)
+    scheduler.add_job('job2', func=advanced.job2, trigger='interval', seconds=30, args=[], replace_existing=True)
     scheduler.start()
-
-    # redis 连接池
 
     # 注册路由
     from myflask.user import user
     from myflask.monitor import monitor
     app.register_blueprint(user, url_prefix='/')
     app.register_blueprint(monitor, url_prefix='/monitor')
-
 
     # 钩子函数
     app.before_request(sys_before_request)
@@ -62,7 +63,7 @@ def register_extensions(app):
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Role, db.session))
 
-# 初始用户
+# 初始用户(应该单独写成flask_script脚本)
 def init_user(app):
     from myflask.models import User, Role
     with app.app_context():
@@ -77,5 +78,6 @@ def init_user(app):
         print(user_admin)
         db.session.add(user_admin)
         db.session.commit()
+        print("初始化用户完成")
 
 

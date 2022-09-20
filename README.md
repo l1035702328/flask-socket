@@ -1,4 +1,6 @@
+
 # flask-socket
+virtualenv venv
 venv\Scripts\activate
 # 创建迁移存储库 只执行一次
 .\manage.py db init

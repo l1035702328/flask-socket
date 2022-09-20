@@ -27,9 +27,19 @@ class Config:
         'host': '119.91.55.183',
         'port': 6379,
         'password': '1156989490',
-        'db': 1
+        'db': 1,
+        'decode_responses': True
     }
-    SCHEDULER_JOBSTORES = {"default": RedisJobStore(**REDIS_DB_URL)}
+
+    SCHEDULER_REDIS_DB_URL = {
+        'host': '119.91.55.183',
+        'port': 6379,
+        'password': '1156989490',
+        'db': 2
+    }
+
+
+    SCHEDULER_JOBSTORES = {"default": RedisJobStore(**SCHEDULER_REDIS_DB_URL)}
 
     SCHEDULER_EXECUTORS = {"default": {"type": "threadpool", "max_workers": 20}}
 

@@ -14,7 +14,7 @@ from mysocket import socket_server
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
-manager.add_command("runserver", Server(host='0.0.0.0', use_debugger=True))
+manager.add_command("runserver", Server(host='0.0.0.0', use_debugger=False))
 
 migrate = Migrate(app, db)
 # def make_shell_context():

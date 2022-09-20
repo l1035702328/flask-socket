@@ -21,7 +21,7 @@ class MyServer(BaseRequestHandler):
     """
     def setup(self):
         print("从连接池抽取连接")
-        self.redis_pool = self.server.redis_pool
+        self.redis_conn = self.server.redis_conn
         self.num = 0
 
     def handle(self):
@@ -35,27 +35,26 @@ class MyServer(BaseRequestHandler):
         print(data)
         name = re.search('(?<=name:)\w+', data).group()
         flag = {'power_flag': '0', 'upgrade_flag': '0', 'filename': '0'}
-        redis_conn = redis.Redis(connection_pool=self.redis_pool)
-        redis_conn.hset("{}_flag".format(name), mapping=flag)
+        self.redis_conn.hset("{}_flag".format(name), mapping=flag)
+        self.redis_conn.sadd('register_id', name)
         while True:
-            print("创建的连接个数{}".format(self.redis_pool._created_connections))
-            print("连接池连接列表{}".format(self.redis_pool._available_connections))
+            print("创建的连接个数{}".format(self.redis_conn.connection_pool._created_connections))
+            print("连接池连接列表{}".format(self.redis_conn.connection_pool._available_connections))
             self.num += 1
-            print(self.num)
+            print("线程内部循环累加器{}".format(self.num))
             print("进入循环")
             data = conn.recv(1024).decode()
-            print(data)
-            if data == "exit":
+            if not data:
                 print("断开与%s的连接！" % (self.client_address,))
                 break
             print("来自%s的客户端向你发来信息：%s" % (self.client_address, data))
             conn.sendall(('已收到你的消息<%s>\0' % data).encode())
             try:
                 name = re.search('(?<=name:)\w+', data).group()
-                redis_conn = redis.Redis(connection_pool=self.redis_pool)
-                result_num = redis_conn.rpush(name, data)
+
+                result_num = self.redis_conn.rpush(name, data)
                 print("插入成功")
-                result = redis_conn.hgetall(name + '_flag')
+                result = self.redis_conn.hgetall(name + '_flag')
                 print(result)
                 if result['power_flag'] == '1':
                     print("执行关闭电源指令")
@@ -73,9 +72,9 @@ class MyServer(BaseRequestHandler):
 
 
 class MyTCPServer(TCPServer):
-    def __init__(self, server_address: Tuple[str, int], RequestHandlerClass, bind_and_activate=True, redis_pool=None):
+    def __init__(self, server_address: Tuple[str, int], RequestHandlerClass, bind_and_activate=True, redis_conn=None):
         super(MyTCPServer, self).__init__(server_address, RequestHandlerClass, bind_and_activate)
-        self.redis_pool = redis_pool
+        self.redis_conn = redis_conn
 
 
 class MyThreadingTCPServer(ThreadingMixIn, MyTCPServer): pass
@@ -91,9 +90,10 @@ class SocketRun(Command):
         logging.info("hello")
         redis_pool = redis.ConnectionPool(host='119.91.55.183', port=6379, password='1156989490', db=1,
                                           decode_responses=True)
+        redis_conn = redis.Redis(connection_pool=redis_pool)
         print("初始化线程池完毕")
         # 创建一个多线程TCP服务器
-        server = MyThreadingTCPServer(('127.0.0.1', 6000), MyServer, redis_pool=redis_pool)
+        server = MyThreadingTCPServer(('127.0.0.1', 6000), MyServer, redis_conn=redis_conn)
         with server:
             print("启动socketserver服务器！")
             # 启动服务器，服务器将一直保持运行状态
